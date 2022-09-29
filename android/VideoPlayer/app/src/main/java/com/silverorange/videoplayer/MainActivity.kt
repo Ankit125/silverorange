@@ -97,6 +97,8 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     hideProgressDialog()
                     mVideoList = response.body()!!
+                    mVideoList.sortByDescending { it.publishedAt }
+
                     val mediaItems: ArrayList<MediaItem> = ArrayList()
                     for (item in mVideoList) {
                         mediaItems.add(MediaItem.fromUri(item.fullURL))
@@ -104,8 +106,6 @@ class MainActivity : AppCompatActivity() {
                     mExoPlayer.setMediaItems(mediaItems)
                     mIndex = 0
                     setMediaPlayer(mIndex)
-
-
                 }
             }
 
@@ -148,8 +148,9 @@ class MainActivity : AppCompatActivity() {
     fun setMediaPlayer(mCounter: Int) {
         mPause.visibility = View.GONE
         mPlay.visibility = View.VISIBLE
-        mTxtTitle.setText(mVideoList.get(mCounter).title)
-        mTxtAuthor.setText(mVideoList.get(mCounter).author.name)
+        mTxtTitle.text = mVideoList[mCounter].title
+        mTxtAuthor.text = mVideoList[mCounter].author.name
+
         var mDescription: String = mVideoList.get(mCounter).description.replace(
             "\\n", System.getProperty("line.separator")
         )
