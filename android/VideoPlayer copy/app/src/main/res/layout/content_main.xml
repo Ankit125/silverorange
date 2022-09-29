@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="67">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                <LinearLayout
+                    android:id="@+id/mController"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true">
+
+                    <ImageButton
+                        android:id="@+id/mPrevious"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_previous" />
+
+                    <ImageButton
+                        android:id="@+id/mPlay"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_play" />
+
+                    <ImageButton
+                        android:id="@+id/mPause"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_pause" />
+
+                    <ImageButton
+                        android:id="@+id/mNext"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_next" />
+                </LinearLayout>
+
+                <com.google.android.exoplayer2.ui.StyledPlayerView
+                    android:id="@+id/mPlayerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible"
+                    app:resize_mode="fill"
+                    app:show_buffering="when_playing"
+                    app:show_shuffle_button="true"
+                    app:use_controller="false">
+
+                </com.google.android.exoplayer2.ui.StyledPlayerView>
+            </RelativeLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="33">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/mTxtDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="vertical"
+                        android:text="" />
+
+                </LinearLayout>
+            </ScrollView>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
