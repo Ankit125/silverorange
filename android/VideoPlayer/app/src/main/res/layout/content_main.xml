@@ -20,6 +20,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+
+                <LinearLayout
+                    android:id="@+id/mController"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="center">
+
+                    <ImageButton
+                        android:id="@+id/mPrevious"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_previous" />
+
+                    <ImageButton
+                        android:id="@+id/mPlay"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_play" />
+
+                    <ImageButton
+                        android:id="@+id/mPause"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_pause" />
+
+                    <ImageButton
+                        android:id="@+id/mNext"
+                        android:layout_width="65dp"
+                        android:layout_height="65dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/roundcorner"
+                        android:src="@drawable/exo_controls_next" />
+                </LinearLayout>
+
                 <com.google.android.exoplayer2.ui.StyledPlayerView
                     android:id="@+id/mPlayerView"
                     android:layout_width="match_parent"
@@ -28,7 +70,7 @@
                     app:resize_mode="fill"
                     app:show_buffering="when_playing"
                     app:show_shuffle_button="true"
-                    app:use_controller="true">
+                    app:use_controller="false">
 
                 </com.google.android.exoplayer2.ui.StyledPlayerView>
             </RelativeLayout>
@@ -46,14 +88,35 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/mTxtTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="vertical"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/mTxtAuthor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10sp"
+                        android:scrollbars="vertical"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/mTxtDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:scrollbars="vertical"
-                        android:text="" />
+                        android:text=""
+                        android:textColor="@color/black" />
 
                 </LinearLayout>
             </ScrollView>

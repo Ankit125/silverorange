@@ -1,44 +1,182 @@
 package com.silverorange.videoplayer
 
-import android.os.Build
 import android.os.Bundle
-import android.text.Html
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import org.w3c.dom.Text
+import com.silverorange.videoplayer.retrofit.RetrofitHelper
+import com.silverorange.videoplayer.retrofit.VideoApi
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     lateinit var mPlayerView: StyledPlayerView
     lateinit var mExoPlayer: ExoPlayer
     lateinit var mMediaItem: MediaItem
+    lateinit var mTxtTitle: TextView
+    lateinit var mTxtAuthor: TextView
     lateinit var mTxtDescription: TextView
-
+    lateinit var mPrevious: ImageButton
+    lateinit var mPlay: ImageButton
+    lateinit var mPause: ImageButton
+    lateinit var mNext: ImageButton
+    lateinit var dialog: AlertDialog
+    lateinit var mVideoList: ArrayList<ApiResponse>
+    var mIndex: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mPlayerView = findViewById(R.id.mPlayerView)
+        mTxtTitle = findViewById(R.id.mTxtTitle)
+        mTxtAuthor = findViewById(R.id.mTxtAuthor)
         mTxtDescription = findViewById(R.id.mTxtDescription)
         mPlayerView.hideController()
         mExoPlayer = ExoPlayer.Builder(applicationContext).build()
         mPlayerView.player = mExoPlayer;
-        mMediaItem =
-            MediaItem.fromUri("https://d140vvwqovffrf.cloudfront.net/media/5e87b9a811599/full/720.mp4")
-        mExoPlayer.setMediaItem(mMediaItem)
-        mExoPlayer.prepare()
-        mExoPlayer.play()
 
-        var mText: String =
-            "# Famemque horrescere occasus neve\\n\\n## Ityosque oraque subvolat patetis\\n\\nLorem markdownum purpura Scyrum, ira aper cruribus purpurea at neve\\npraecordiaque illa de erat. Lapithae pollice; nec *aret principiis* sua preces\\nregia nam? Templa cruorem sparsos **ardua** protinus *subtraheret fruge*\\nexemplum, esse, toros. Ubi quibus sparsaque tutela.\\n\\n- Suo rogat lumina puto ut frater Lycetum\\n- Illos dilecta diva\\n- Quoniam Daedalus\\n- Vulnere coniuge trisulcis nunc leves\\n- Una veluti mea Achivi ferum pectus\\n- Pressit tu Iovis mutantur sedere Credulitas ambage\\n\\n*Vitataque Fame cornibus* volubilitas ad nec insania petito adrectisque ipsa\\nanimasque pugnabant ferrum parant. Sensit haec promissaque currus. Tauri levius\\ntetigisset dixere est mora ponti, ea posuit pedem circuit: viribus, iterum, e\\nseque! Temptare perpetuo ferit non telis Hippotaden milibus valuissent\\n[ait](http://incensaquefaveas.com/aera), corpore volenti instruxere Anienis\\namor, bis saxum?\\n\\n## Regemque miscuit capit amanti\\n\\nTalibus haustus, nec ficti: ille una lacertis praeter dixerat inputet.\\n[Instabiles illam](http://cerniset.net/sacraangustis), suique [mentitus manus\\nserpente](http://www.opportunacadentem.org/certum): conataque artes latos!\\n\\n- Alter sua\\n- Amentis clamor\\n- Suspirat albentibus delusa barbariam Gigantas umbras at\\n- Vertit iuventus\\n- Ergo conspexi aratri infausto audacia esset\\n\\n## Rebus in parantem dignum ruptosque collis certamine\\n\\nNon Creten mirabere concrescere ipse virgineos quos et mensis iunget, nullamque\\nLibycas. Uterum monimenta nunc obliquo fiant **illa** ante haeremusque opesque\\nOthrys, rursusque indoctum ignibus **comites Iri**. Sermonibus ripa flectant\\npudibundaque ardet est medioque nobilis, heres me genetrix videritis illa. Humo\\ndum ac accepit mando imagine similis, ingemuit ora omnes offensa omnia causa\\nuberibus fertque aequora?\\n\\nFrustra fecit pan! Unum deosque membra: nova: inter sic genitor terra somni\\nAeoliden quam telae. Haec gravis non facies lata mille, procorum possem scopulo,\\nsibi sic maius iussa; ante caelestum ungues, opem. Ramis sanguine, si *nec\\nmiseris scitatur* pereuntem comites, vult et cani cur ventorum, tuebere\\ntenuaverat, multi.\\n\\nNeque gemitu. Quo moles ex quis certa adhaesit hanc saltu nigrae [adeundi\\ncarinae](http://vultus-antiquas.io/) vobis murmure haberet ira factis? Et\\n**adiere** inplevere sibi, retia."
+        var mController: LinearLayout = findViewById(R.id.mController)
+        mController.bringToFront()
 
-        mText = mText.replace("\\n", "<br/>")
-        mTxtDescription.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(mText, Html.FROM_HTML_MODE_COMPACT)
-        } else {
-            Html.fromHtml(mText)
+        mPrevious = findViewById(R.id.mPrevious)
+        mPlay = findViewById(R.id.mPlay)
+        mPause = findViewById(R.id.mPause)
+        mNext = findViewById(R.id.mNext)
+        mPlay.visibility = View.VISIBLE
+        mPause.visibility = View.GONE
+
+        mPlay.setOnClickListener {
+            mExoPlayer.prepare()
+            mExoPlayer.play()
+            mPause.visibility = View.VISIBLE
+            mPlay.visibility = View.GONE
         }
+
+        mPause.setOnClickListener {
+            mExoPlayer.pause()
+            mPause.visibility = View.GONE
+            mPlay.visibility = View.VISIBLE
+        }
+
+        mNext.setOnClickListener {
+            mExoPlayer.stop()
+            mExoPlayer.moveMediaItem(mIndex, mIndex + 1)
+            mExoPlayer.seekTo(0)
+            mIndex++
+            setMediaPlayer(mIndex)
+        }
+        mPrevious.setOnClickListener {
+            mExoPlayer.stop()
+            mExoPlayer.moveMediaItem(mIndex, mIndex - 1)
+            mExoPlayer.seekTo(0)
+            mIndex--
+            setMediaPlayer(mIndex)
+        }
+
+        getVideoList()
+    }
+
+    fun getVideoList() {
+        setProgressDialog()
+        val retrofitAPI = RetrofitHelper.getInstance().create(VideoApi::class.java)
+        val call: Call<ArrayList<ApiResponse>> = retrofitAPI.getVideo()
+        call!!.enqueue(object : Callback<ArrayList<ApiResponse>?> {
+            override fun onResponse(
+                call: Call<ArrayList<ApiResponse>?>, response: Response<ArrayList<ApiResponse>?>
+            ) {
+                if (response.isSuccessful) {
+                    hideProgressDialog()
+                    mVideoList = response.body()!!
+                    val mediaItems: ArrayList<MediaItem> = ArrayList()
+                    for (item in mVideoList) {
+                        mediaItems.add(MediaItem.fromUri(item.fullURL))
+                    }
+                    mExoPlayer.setMediaItems(mediaItems)
+                    mIndex = 0
+                    setMediaPlayer(mIndex)
+
+
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<ApiResponse>?>, t: Throwable) {
+                hideProgressDialog()
+                Toast.makeText(this@MainActivity, "Fail to get the data..", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        })
+    }
+
+    fun setProgressDialog() {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this, R.style.NewDialog)
+        builder.setCancelable(false)
+        builder.setView(R.layout.progress_view)
+        dialog = builder.create()
+        dialog.show()
+
+        val window: Window? = dialog.window
+        if (window != null) {
+            val layoutParams = WindowManager.LayoutParams()
+            layoutParams.copyFrom(dialog.window?.attributes)
+            layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT
+            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
+            dialog.window?.attributes = layoutParams
+
+            // Disabling screen touch to avoid exiting the Dialog
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        }
+    }
+
+    fun hideProgressDialog() {
+        dialog.hide()
+        dialog.dismiss()
+    }
+
+    fun setMediaPlayer(mCounter: Int) {
+        mPause.visibility = View.GONE
+        mPlay.visibility = View.VISIBLE
+        mTxtTitle.setText(mVideoList.get(mCounter).title)
+        mTxtAuthor.setText(mVideoList.get(mCounter).author.name)
+        var mDescription: String = mVideoList.get(mCounter).description.replace(
+            "\\n", System.getProperty("line.separator")
+        )
+        mTxtDescription.setText(mDescription);
+
+        if (mCounter == 0) {
+            mPrevious.visibility = View.INVISIBLE
+        } else {
+            mPrevious.visibility = View.VISIBLE
+        }
+
+        if (mCounter == mVideoList.size - 1) {
+            mNext.visibility = View.INVISIBLE
+        } else {
+            mNext.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mExoPlayer.stop()
+        mExoPlayer.release()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mExoPlayer.stop()
+        mExoPlayer.release()
     }
 }
